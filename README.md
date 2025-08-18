@@ -1,37 +1,52 @@
-<<<<<<< HEAD
-# RAG-Homework
-=======
-# Essentials of LLM — Assignment Repo
+# Smart Librarian – AI with RAG + Tool
 
-Scaffold generated on 2025-08-18. Fill in the TODO sections with your assignment specifics from the PDF.
+An AI-powered chatbot that recommends books based on user interests, using **OpenAI GPT** combined with **Retrieval-Augmented Generation (RAG)** via **ChromaDB**, and then enriches the recommendation with a detailed summary from a custom tool.
+
+---
+
+## Features
+
+* **Semantic search (RAG)**: Store and retrieve book summaries with embeddings.
+* **AI-powered chatbot**: Natural language recommendations using GPT.
+* **Custom tool integration**: `get_summary_by_title(title)` provides detailed summaries.
+* **Optional extensions**:
+
+  * Inappropriate language filter
+  * Text-to-Speech (TTS)
+  * Speech-to-Text (STT)
+  * Book cover or scene image generation
+  * Alternative frontend (React, Angular, Vue) with Python backend【111†source】
+
+---
 
 ## Project Structure
 
 ```
 .
-├── README.md
+├── README.md                # Project documentation
 ├── .gitignore
 ├── LICENSE
-├── environment.yml
-├── requirements.txt
-├── Makefile
+├── environment.yml          # Conda environment
+├── requirements.txt         # Pip requirements
+├── Makefile                 # Common tasks
 ├── docker/
 │   └── Dockerfile
 ├── src/
 │   ├── data/
-│   │   └── make_dataset.py
+│   │   └── make_dataset.py  # Load and embed summaries into ChromaDB
 │   ├── models/
-│   │   ├── rag_pipeline.py
-│   │   └── fine_tune.py
+│   │   ├── rag_pipeline.py  # Retrieval + GPT pipeline
+│   │   └── fine_tune.py     # (Optional) fine-tuning scripts
 │   └── utils/
-│       ├── io.py
-│       └── eval.py
+│       ├── io.py            # I/O helpers
+│       └── eval.py          # Evaluation helpers
 ├── notebooks/
 │   ├── 01_exploration.ipynb
 │   ├── 02_prompt_engineering.ipynb
 │   ├── 03_rag.ipynb
 │   └── 04_finetuning.ipynb
 ├── data/
+│   ├── book_summaries.json  # Main dataset (10+ books)
 │   ├── raw/.gitkeep
 │   ├── processed/.gitkeep
 │   └── external/.gitkeep
@@ -41,65 +56,91 @@ Scaffold generated on 2025-08-18. Fill in the TODO sections with your assignment
     └── test_utils.py
 ```
 
+---
+
 ## Quickstart
 
-### 1) Create and activate environment
+### 1. Environment Setup
 
-Using conda (recommended):
+**With Conda**
 
 ```bash
 conda env create -f environment.yml
 conda activate llm-assignment
 ```
 
-Or with venv + pip:
+**With pip/venv**
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+source .venv/bin/activate   # On Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2) Configure secrets
+### 2. Configure Secrets
 
-Copy `.env.example` to `.env` and set your keys (e.g., OpenAI). Never commit `.env`.
+Copy `.env.example` to `.env` and add your **OpenAI API key**.
 
-### 3) Run notebooks
+### 3. Add Book Summaries
 
-Start Jupyter and work through `notebooks/` in order. Each notebook includes TODO blocks tied to the assignment.
+Create `data/book_summaries.json` with at least 10 books, e.g.:
 
-### 4) Tests
+```json
+{
+  "1984": "A dystopian story about a totalitarian society...",
+  "The Hobbit": "Bilbo Baggins embarks on an adventure with dwarves..."
+}
+```
+
+### 4. Initialize Vector Store
+
+```bash
+python src/data/make_dataset.py
+```
+
+### 5. Run the Chatbot
+
+* **CLI version**:
+
+```bash
+python src/chat.py
+```
+
+* **Streamlit version**:
+
+```bash
+streamlit run app.py
+```
+
+### 6. Run Tests
 
 ```bash
 pytest -q
 ```
 
-### 5) Make common tasks easier
+---
 
-```bash
-make help
-```
+## Deliverables
 
-## Repo Tasks (align with your assignment)
+* `book_summaries.json` with 10+ books
+* ChromaDB initialization scripts
+* `get_summary_by_title()` tool
+* Chatbot with GPT + tool integration
+* CLI or Streamlit interface
+* Updated `README.md` with build & run instructions【111†source】
 
-- [ ] Data exploration and preprocessing (notebooks/01_exploration.ipynb)
-- [ ] Prompt engineering experiments (notebooks/02_prompt_engineering.ipynb)
-- [ ] Retrieval-Augmented Generation (src/models/rag_pipeline.py, notebooks/03_rag.ipynb)
-- [ ] Fine-tuning experiments (src/models/fine_tune.py, notebooks/04_finetuning.ipynb)
-- [ ] Evaluation & report (src/utils/eval.py, docs/report.md)
+---
 
-## GitHub Setup
+## Example Queries
 
-After unzipping:
+* „Vreau o carte despre libertate și control social.”
+* „Ce-mi recomanzi dacă iubesc poveștile fantastice?”
+* „Ce este 1984?”【111†source】
 
-```bash
-git init
-git add .
-git commit -m "Initial scaffold for Essentials of LLM assignment"
-# Create a repo on GitHub, then:
-git branch -M main
-git remote add origin https://github.com/<your-user>/essentials-llm-assignment.git
-git push -u origin main
-```
+---
 
->>>>>>> a8c2cba (Initial scaffold for RAG Homework)
+## Notes
+
+* Alternative vector stores are acceptable; if OpenAI vector store is used, document issues encountered【111†source】.
+* The focus is on understanding the **code and flow** of RAG + tool calling【111†source】.
+* Extensions (TTS, STT, images, advanced UI) are optional but encouraged for extra functionality.
