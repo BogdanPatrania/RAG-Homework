@@ -1,0 +1,16 @@
+jupyterlab
+ipykernel
+numpy
+pandas
+scikit-learn
+matplotlib
+python-dotenv
+transformers
+sentence-transformers
+chromadb
+faiss-cpu
+openai
+tiktoken
+langchain
+pydantic
+pytest

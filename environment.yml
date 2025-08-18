@@ -1,0 +1,23 @@
+name: llm-assignment
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - jupyterlab
+  - ipykernel
+  - numpy
+  - pandas
+  - scikit-learn
+  - matplotlib
+  - python-dotenv
+  - pip
+  - pip:
+      - transformers
+      - sentence-transformers
+      - chromadb
+      - faiss-cpu
+      - openai
+      - tiktoken
+      - langchain
+      - pydantic
+      - pytest
