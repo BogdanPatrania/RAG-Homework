@@ -17,3 +17,5 @@ pytest
 chromadb
 openai
 streamlit
+
+better-profanity==0.6.1

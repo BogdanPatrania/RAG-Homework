@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from src.models.rag_pipeline import retrieve
 from src.utils.summaries import get_summary_by_title
+from src.utils.moderation import is_inappropriate, censor
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -43,6 +44,15 @@ if __name__ == "__main__":
     print("Type your question (or 'exit'):")
     while True:
         q = input("> ").strip()
-        if not q or q.lower() in {"exit","quit"}:
+        if not q or q.lower() in {"exit", "quit"}:
             break
+
+        # 🔎 check for inappropriate language before sending to LLM
+        if is_inappropriate(q):
+            print("Prefer să păstrăm conversația civilizată. Mesajul a fost cenzurat și NU a fost trimis la LLM.")
+            print("Mesaj cenzurat:", censor(q))
+            continue
+
+        # otherwise, run the normal recommendation flow
         print(recommend(q))
+

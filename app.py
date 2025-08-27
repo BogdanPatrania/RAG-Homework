@@ -10,6 +10,8 @@ from openai import OpenAI
 # Local modules
 from src.models.rag_pipeline import retrieve
 from src.utils.summaries import get_summary_by_title
+from src.utils.moderation import is_inappropriate, censor
+
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -65,6 +67,10 @@ query = st.text_input("Ce carte ți-ai dori? (ex: „o carte despre prietenie ș
 submit = st.button("Recomandă")
 
 if submit and query.strip():
+    if is_inappropriate(query):
+        st.warning("Preferăm un limbaj civilizat. Mesajul a fost cenzurat și NU a fost trimis la LLM.")
+        st.code(censor(query))
+        st.stop()
     with st.spinner("Caut…"):
         result = recommend(query.strip(), top_k=top_k, model=model, temperature=temperature)
 
