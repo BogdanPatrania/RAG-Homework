@@ -16,3 +16,4 @@ pydantic
 pytest
 chromadb
 openai
+streamlit
