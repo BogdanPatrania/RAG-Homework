@@ -6,16 +6,11 @@ An AI-powered chatbot that recommends books based on user interests, using **Ope
 
 ## Features
 
-* **Semantic search (RAG)**: Store and retrieve book summaries with embeddings.
-* **AI-powered chatbot**: Natural language recommendations using GPT.
-* **Custom tool integration**: `get_summary_by_title(title)` provides detailed summaries.
-* **Optional extensions**:
-
-  * Inappropriate language filter
-  * Text-to-Speech (TTS)
-  * Speech-to-Text (STT)
-  * Book cover or scene image generation
-  * Alternative frontend (React, Angular, Vue) with Python backend【111†source】
+- **Semantic search (RAG)**: store and retrieve book summaries with embeddings.
+- **AI-powered chatbot**: natural language recommendations using GPT.
+- **Custom tool integration**: `get_summary_by_title(title)` provides detailed summaries.
+- **Moderation (Romanian)**: offensive queries are censored and **not sent** to the LLM (works in CLI and Streamlit).
+- **Optional extensions**: Text-to-Speech (TTS), Speech-to-Text (STT), image generation, richer UI.
 
 ---
 
@@ -23,94 +18,94 @@ An AI-powered chatbot that recommends books based on user interests, using **Ope
 
 ```
 .
-├── README.md                # Project documentation
-├── .gitignore
-├── LICENSE
-├── environment.yml          # Conda environment
-├── requirements.txt         # Pip requirements
-├── Makefile                 # Common tasks
-├── docker/
-│   └── Dockerfile
+├── README.md
+├── requirements.txt
+├── app.py                      # Streamlit UI chatbot
 ├── src/
+│   ├── chat.py                 # CLI chatbot
 │   ├── data/
-│   │   └── make_dataset.py  # Load and embed summaries into ChromaDB
+│   │   └── make_dataset.py     # Build ChromaDB from summaries
 │   ├── models/
-│   │   ├── rag_pipeline.py  # Retrieval + GPT pipeline
-│   │   └── fine_tune.py     # (Optional) fine-tuning scripts
+│   │   └── rag_pipeline.py     # Retriever
 │   └── utils/
-│       ├── io.py            # I/O helpers
-│       └── eval.py          # Evaluation helpers
-├── notebooks/
-│   ├── 01_exploration.ipynb
-│   ├── 02_prompt_engineering.ipynb
-│   ├── 03_rag.ipynb
-│   └── 04_finetuning.ipynb
+│       ├── summaries.py        # Summary tool
+│       └── moderation.py       # Romanian profanity filter
 ├── data/
-│   ├── book_summaries.json  # Main dataset (10+ books)
-│   ├── raw/.gitkeep
-│   ├── processed/.gitkeep
-│   └── external/.gitkeep
-├── docs/
-│   └── report.md
+│   ├── raw/book_summaries.json
+│   ├── processed/chroma/       # ChromaDB persistent store
+│   └── external/badwords_ro.txt
 └── tests/
-    └── test_utils.py
+    ├── test_utils.py
+    ├── test_summaries.py
+    └── test_retriever.py
 ```
 
 ---
 
 ## Quickstart
 
-### 1. Environment Setup
-
-**With Conda**
-
-```bash
-conda env create -f environment.yml
-conda activate llm-assignment
-```
-
-**With pip/venv**
+### 1. Environment
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate   # On Windows: .venv\Scripts\activate
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
 ### 2. Configure Secrets
 
-Copy `.env.example` to `.env` and add your **OpenAI API key**.
+Create `.env` and set:
 
-### 3. Add Book Summaries
-
-Create `data/book_summaries.json` with at least 10 books, e.g.:
-
-```json
-{
-  "1984": "A dystopian story about a totalitarian society...",
-  "The Hobbit": "Bilbo Baggins embarks on an adventure with dwarves..."
-}
+```
+OPENAI_API_KEY=your_real_key
 ```
 
-### 4. Initialize Vector Store
+### 3. Book Summaries
+
+Add at least 10 entries in `data/raw/book_summaries.json`:
+
+```json
+[
+  {
+    "title": "1984",
+    "short_summary": "A dystopian story about a totalitarian society...",
+    "themes": ["libertate", "control social", "distopie"]
+  },
+  {
+    "title": "The Hobbit",
+    "short_summary": "Bilbo Baggins embarks on an adventure with dwarves...",
+    "themes": ["prietenie", "aventură", "magie"]
+  }
+]
+```
+
+### 4. Build Vector Store
 
 ```bash
-python src/data/make_dataset.py
+python -m src.data.make_dataset
+# optional probe
+python -m src.data.make_dataset --probe "prietenie și magie" --top_k 5
 ```
 
 ### 5. Run the Chatbot
 
-* **CLI version**:
+**CLI**:
 
 ```bash
-python src/chat.py
+python -m src.chat
 ```
 
-* **Streamlit version**:
+**Streamlit**:
 
 ```bash
 streamlit run app.py
 ```
+
+Both versions:
+- Retrieve candidates from ChromaDB.
+- Ask GPT for one recommendation (`RECOMMENDATION_TITLE: ...`).
+- Append detailed summary from the tool.
+- Block inappropriate inputs with the Romanian profanity filter.
 
 ### 6. Run Tests
 
@@ -122,25 +117,27 @@ pytest -q
 
 ## Deliverables
 
-* `book_summaries.json` with 10+ books
-* ChromaDB initialization scripts
-* `get_summary_by_title()` tool
-* Chatbot with GPT + tool integration
-* CLI or Streamlit interface
-* Updated `README.md` with build & run instructions【111†source】
+- `data/raw/book_summaries.json` (10+ books)
+- ChromaDB init (`src/data/make_dataset.py`)
+- Retriever (`src/models/rag_pipeline.py`)
+- Tool (`src/utils/summaries.py`)
+- Chatbot: CLI (`src/chat.py`) + Streamlit (`app.py`)
+- Moderation (`src/utils/moderation.py`)
+- README (this file)
+- Tests (`tests/`)
 
 ---
 
 ## Example Queries
 
-* „Vreau o carte despre libertate și control social.”
-* „Ce-mi recomanzi dacă iubesc poveștile fantastice?”
-* „Ce este 1984?”【111†source】
+- „Vreau o carte despre libertate și control social.”
+- „Ce-mi recomanzi dacă iubesc poveștile fantastice?”
+- „Ce este 1984?”
 
 ---
 
 ## Notes
 
-* Alternative vector stores are acceptable; if OpenAI vector store is used, document issues encountered【111†source】.
-* The focus is on understanding the **code and flow** of RAG + tool calling【111†source】.
-* Extensions (TTS, STT, images, advanced UI) are optional but encouraged for extra functionality.
+- Alternative vector stores are acceptable; if you use OpenAI’s vector store, document issues.
+- Focus: demonstrate **RAG + tool calling** and understand the flow.
+- Extensions (TTS, STT, images, advanced UI) are optional but encouraged.
